@@ -2,3 +2,5 @@
 
 $hoge = 'hoge';
 $hage = 'hage';
+
+//hoge
