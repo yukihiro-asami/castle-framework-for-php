@@ -2,6 +2,6 @@
 namespace castle;
 return function (array &$vals) : string
 {
-    $vals[''] = generate_token();
+    $vals['syslog_id'] = generate_token();
     return 'success';
 };
