@@ -1,17 +1,21 @@
 <?php
-namespace castle;
+
+echo __DIR__;
+
 include('libs/load.php');
 $commands = [
-    'get_syslog_id'
+    'capture_dir'
 ];
-$results = [];
-$vals = [];
+
+$__results = [];
+$__vals = [];
+$__body = '';
+
 
 foreach ($commands as $command)
 {
     $closure = include('closures/' . $command . '.php');
-    $results[$command] = $closure($vals);
+    $__results[$command] = $closure($__vals);
 }
 
-var_dump($results);
-var_dump($vals);
+echo str_replace(PHP_EOL, '<br>', json_encode($__vals, JSON_PRETTY_PRINT));
