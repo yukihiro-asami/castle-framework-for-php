@@ -10,5 +10,6 @@ return function (array &$vals) : string
     $vals['base_dir'] = $base_dir;
     $vals['core_classes_dir'] = $base_dir . 'core/classes/';
     $vals['config_dir'] = $base_dir . 'app/config/';
+    $vals['syslog_dir'] = $base_dir . 'loader/syslog/';
     return 'success';
 };

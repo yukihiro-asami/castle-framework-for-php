@@ -1,12 +1,10 @@
 <?php
 include('libs/load.php');
 $commands = [
-    'get_syslog_id',
     'capture_server',
-    'process_request_uri',
     'capture_dir',
-    'config_setup',
-    'set_up_core_classes'
+    'process_request_uri',
+    'process_syslog'
 ];
 $__results = [];
 $__vals = [];
@@ -16,5 +14,4 @@ foreach ($commands as $command)
     $closure = include('closures/' . $command . '.php');
     $__results[$command] = $closure($__vals);
 }
-
-echo str_replace(PHP_EOL, '<br>', json_encode($__vals, JSON_PRETTY_PRINT));
+//echo str_replace(PHP_EOL, '<br>', json_encode($__vals, JSON_PRETTY_PRINT));
