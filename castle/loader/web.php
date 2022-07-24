@@ -17,4 +17,7 @@ foreach ($commands as $command)
     $__results[$command] = $closure($__vals);
 }
 
-echo str_replace(PHP_EOL, '<br>', json_encode($__vals, JSON_PRETTY_PRINT));
+$obj = new Controller_Hoge();
+$obj->hoge();
+
+//echo str_replace(PHP_EOL, '<br>', json_encode($__vals, JSON_PRETTY_PRINT));
