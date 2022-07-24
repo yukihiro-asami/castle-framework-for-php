@@ -12,7 +12,6 @@ return function (array &$vals) : string
         }
     }
     $vals['captured_config'] = $config;
-    print_r($config);
     $vals['log_file_path'] = $config['castle']['log_file_path'];
     return 'success';
 };
