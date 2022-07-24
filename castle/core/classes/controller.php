@@ -3,6 +3,7 @@ namespace castle;
 class Controller extends Castle
 {
     function hoge(){
-        echo $this->_request_uri();
+        echo '_in_hoge' . '<br>';
+        static::_log_info(new \Exception('hogehoge'));
     }
 }
