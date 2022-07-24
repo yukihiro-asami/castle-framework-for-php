@@ -1,2 +1,2 @@
 <?php
-include('../castle/loader/web.php');
+include_once('../castle/loader/web.php');

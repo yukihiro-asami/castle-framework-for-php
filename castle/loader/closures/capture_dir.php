@@ -6,9 +6,9 @@ return function (array &$vals) : string
     array_shift($dir_array);
     array_pop($dir_array);
     array_pop($dir_array);
-    array_pop($dir_array);
     $base_dir = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $dir_array) . DIRECTORY_SEPARATOR;
     $vals['base_dir'] = $base_dir;
-    $vals['app_classes_dir'] = $base_dir . 'core/classes/core/';
+    $vals['core_classes_dir'] = $base_dir . 'core/classes/';
+    $vals['config_dir'] = $base_dir . 'app/config/';
     return 'success';
 };
