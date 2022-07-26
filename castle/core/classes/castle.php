@@ -10,10 +10,10 @@ class Castle
     {
         if ($message instanceof \Throwable)
         {
-            $logging_message = $message->getMessage() . ' ' . static::_value('_syslog_id') . PHP_EOL
+            $logging_message = $message->getMessage() . ' s_id:' . static::_value('syslog_id') . PHP_EOL
             . 'throwed at file ' . $message->getFile() . ' at line ' . $message->getLine() . PHP_EOL;
         } else {
-            $logging_message = $message . PHP_EOL;
+            $logging_message = $message . ' s_id:' . static::_value('syslog_id') . PHP_EOL;
         }
         \castle\log(\castle\date_formatted() . ' '. $lebel . ' ' . $logging_message, static::_value('_log_file_path'));
     }
@@ -21,9 +21,10 @@ class Castle
     {
         return static::_value(__FUNCTION__);
     }
-    protected static function _value(string $function_name) : string|array
+    protected static function _value(string $key_or_file_name) : string|array
     {
-        $key = substr($function_name, 1);
+        $key = str_starts_with($key_or_file_name, '_') === true ? substr($key_or_file_name, 1) : $key_or_file_name;
+        echo $key . '<br>';
         global $__vals;
         return $__vals[$key];
     }

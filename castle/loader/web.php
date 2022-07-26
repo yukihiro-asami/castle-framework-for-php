@@ -6,7 +6,8 @@ $commands = [
     'process_request_uri',
     'capture_dir',
     'config_setup',
-    'set_up_core_classes'
+    'set_up_core_classes',
+    'store_syslog'
 ];
 $__results = [];
 $__vals = [];
@@ -16,8 +17,4 @@ foreach ($commands as $command)
     $closure = include('closures/' . $command . '.php');
     $__results[$command] = $closure($__vals);
 }
-
-$obj = new Controller_Hoge();
-$obj->hoge();
-
-//echo str_replace(PHP_EOL, '<br>', json_encode($__vals, JSON_PRETTY_PRINT));
+echo 'ENC->' .  CSL_ENV_DEVELOPMENT;
