@@ -4,7 +4,7 @@ $commands = [
     'capture_server',
     'capture_dir',
     'process_request_uri',
-    'process_syslog'
+    'retrieve_syslog'
 ];
 $__results = [];
 $__vals = [];

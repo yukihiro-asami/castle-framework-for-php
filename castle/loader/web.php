@@ -12,9 +12,12 @@ $commands = [
 $__results = [];
 $__vals = [];
 $__body = '';
+$__status = CSL_HTTP_STATUS_CODE_200_OK;
+$__headers = [];
+$__cookies = [];
+$__dbs = [];
 foreach ($commands as $command)
 {
     $closure = include('closures/' . $command . '.php');
     $__results[$command] = $closure($__vals);
 }
-echo 'ENC->' .  CSL_ENV_DEVELOPMENT;
