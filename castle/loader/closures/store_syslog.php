@@ -7,15 +7,17 @@ return function (array &$vals) : string
         if (in_array($file_name, ['.', '..']) === true)
             continue;
         if (
-            hexdec(
-                explode(
-                    '|',
+            unpack('l',
+                _base64_decode_url_safe(
                     explode(
-                        '.',
-                        $file_name
-                    )[0]
-                )[1]
-            ) < time()
+                        '|',
+                        explode(
+                            '.',
+                            $file_name
+                        )[0]
+                    )[1]
+                )
+            )[1] < time()
         )
             unlink($vals['syslog_dir'] . $file_name);
     }
