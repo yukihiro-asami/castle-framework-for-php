@@ -3,14 +3,12 @@ namespace castle;
 return function (array &$vals) : string
 {
     $base_path =& $vals['core_classes_dir'];
-    foreach (
-        [
-        'Castle',
-        'Controller',
-        'Controller_Hoge'
-        ]
-        as $class_name
-    )
+    $class_names = <<<EOF
+Castle
+Controller
+EOF;
+
+    foreach (explode(PHP_EOL, $class_names) as $class_name)
     {
         $path = mb_strtolower(str_replace('_', '/', $class_name));
         /** @noinspection PhpIncludeInspection */

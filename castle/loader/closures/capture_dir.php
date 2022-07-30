@@ -9,6 +9,7 @@ return function (array &$vals) : string
     $base_dir = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $dir_array) . DIRECTORY_SEPARATOR;
     $vals['base_dir'] = $base_dir;
     $vals['core_classes_dir'] = $base_dir . 'core/classes/';
+    $vals['app_classes_dir'] = $base_dir . 'app/classes/';
     $vals['config_dir'] = $base_dir . 'app/config/';
     $vals['syslog_dir'] = $base_dir . 'loader/syslog/';
     return 'success';
