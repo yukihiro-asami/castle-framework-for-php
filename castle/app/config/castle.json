@@ -1,3 +1,4 @@
 {
-  "log_file_path": "/var/log/php_castle.log"
+  "log_file_path": "/var/log/php_castle.log",
+  "security.allow_x_headers": true
 }

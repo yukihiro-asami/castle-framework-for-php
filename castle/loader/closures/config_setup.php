@@ -13,5 +13,7 @@ return function (array &$vals) : string
     }
     $vals['captured_config'] = $config;
     $vals['log_file_path'] = $config['castle']['log_file_path'];
+    $vals['security.allow_x_headers'] = $config['castle']['security.allow_x_headers'];
+    print_r($vals);
     return 'success';
 };
