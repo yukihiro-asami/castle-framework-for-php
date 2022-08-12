@@ -1,12 +1,13 @@
 <?php
 include('libs/load.php');
-
 $commands = <<<EOF
 get_syslog_id
 capture_dir
 config_setup
 capture_server
 process_request_uri
+capture_php_input
+process_params
 set_up_core_classes
 register_app_auto_loader
 register_shutdown_function
@@ -28,4 +29,9 @@ foreach (explode(PHP_EOL, $commands) as $command)
     $__results[$command] = $closure($__vals);
 }
 
-print_r($__vals);
+foreach ($__vals as $key => $val)
+{
+    echo $key . '<br>';
+    print_r($val);
+    echo '<br>';
+}

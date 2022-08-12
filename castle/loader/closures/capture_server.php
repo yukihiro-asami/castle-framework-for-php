@@ -18,13 +18,9 @@ return function (array &$vals) : string
     $vals['http_x_method_override'] = _check_key($_SERVER, 'HTTP_X_HTTP_METHOD_OVERRIDE');
     if ($vals['security.allow_x_headers'] === false)
     {
-        $vals['method'] = $vals['request_method'] === '' ? 'GET' : $vals['request_method'];
+        $vals['method'] = _empty_next($vals['request_method'], 'GET');
     } else {
-        $vals['method'] = $vals['http_x_method_override'] === '' ?
-            (
-                $vals['request_method'] === '' ? 'GET' : $vals['request_method']
-            )
-            : $vals['http_x_method_override'];
+        $vals['method'] = _empty_next($vals['http_x_method_override'],  $vals['request_method'], 'GET');
     }
     return 'success';
 };

@@ -5,7 +5,7 @@ class Model_Hoge
         return <<<EOF
 <html>
 <head></head>
-<body>from model hoge</body>
+<body></body>
 </html>
 EOF;
     }

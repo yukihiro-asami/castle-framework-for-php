@@ -21,6 +21,7 @@ namespace
     const CSL_ENV_TEST = 'test';
     const CSL_ENV_STAGING = 'staging';
     const CSL_ENV_PRODUCTION = 'production';
+    const CSL_MEDIA_TYPE_APPLICATION_JSON = 'application/json';
 }
 namespace castle
 {
