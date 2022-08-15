@@ -4,6 +4,7 @@ return function (array &$vals) : string
 {
     $vals['captured_server_value'] = $_SERVER;
     $vals['accept_language'] = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
+    $vals['castle_environment_value'] = $_SERVER['CSL_ENV'];
     $vals['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
     $vals['content_type'] = $_SERVER['CONTENT_TYPE'];
     $vals['remote_addr'] = $_SERVER['REMOTE_ADDR'];
