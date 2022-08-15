@@ -18,7 +18,7 @@ return function (array &$vals) : string
         $vals['parsed_query_string'] = $parsed_query_string;
     } else {
         $vals['query_string'] = '';
-        $vals['parsed_query_string'] = '';
+        $vals['parsed_query_string'] = [];
     }
     return 'success';
 };

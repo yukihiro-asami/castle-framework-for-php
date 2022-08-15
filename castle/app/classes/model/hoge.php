@@ -5,7 +5,8 @@ class Model_Hoge
         return <<<EOF
 <html>
 <head></head>
-<body></body>
+<body>
+</body>
 </html>
 EOF;
     }

@@ -18,6 +18,7 @@ EOF;
 $__results = [];
 $__vals = [];
 $__body = '';
+$__protocol = 'HTTP/1.1';
 $__status = CSL_HTTP_STATUS_CODE_200_OK;
 $__headers = [];
 $__cookies = [];
