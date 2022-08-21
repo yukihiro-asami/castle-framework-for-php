@@ -13,6 +13,8 @@ capture_php_input
 process_params
 set_up_core_classes
 register_app_auto_loader
+register_exception_handler
+register_error_handler
 register_shutdown_function
 process_controller
 process_controller_with_value
