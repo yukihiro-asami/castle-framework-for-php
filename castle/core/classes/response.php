@@ -4,13 +4,18 @@ use JetBrains\PhpStorm\NoReturn;
 
 class Response extends Castle
 {
-    function __construct($body = '', $status = 200, array $headers = array())
+    function __construct(string|View $body = '', $status = 200, array $headers = array())
     {
-        store_body($body);
+        if (gettype($body) === 'string')
+        {
+            store_body($body);
+        } else {
+            store_body($body->render());
+        }
         $this->set_status($status);
         array_map(fn($header) => append_header($header[0], $header[1]), $headers);
     }
-    static function forge($body = '', $status = 200, array $headers = array()) : Response
+    static function forge(string|View $body = '', $status = 200, array $headers = array()) : Response
     {
         return new static($body, $status, $headers);
     }

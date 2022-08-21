@@ -7,6 +7,7 @@ return function (array &$vals) : string
 Castle
 Controller
 Response
+View
 EOF;
 
     foreach (explode(PHP_EOL, $class_names) as $class_name)

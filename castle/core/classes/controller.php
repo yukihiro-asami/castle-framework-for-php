@@ -2,16 +2,21 @@
 namespace castle;
 class Controller extends Castle
 {
-    protected string $view_path = '';
-
+    protected string $_view_filename;
+    public function setViewFilename(string $view_filename): void
+    {
+        $this->_view_filename = $view_filename;
+    }
     function __construct()
     {
-        $class_array = explode('_', __CLASS__);
+        $class_array = explode('_', get_class($this));
         array_shift($class_array);
-        array_map(
-            fn ($string) => mb_strtolower($string),
-            $class_array
-        );
-        $this->view_path = static::_views_dir() . implode('/', $class_array);
+        $this->_view_filename = implode('/',
+            array_map(
+                fn ($string) => mb_strtolower($string),
+                $class_array
+            )
+        )
+        . '.php';
     }
 }
