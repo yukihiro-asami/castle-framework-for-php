@@ -1,4 +1,7 @@
 <?php
+
+use function castle\_explode_recursively;
+
 include('libs/load.php');
 $commands = <<<EOF
 get_syslog_id
@@ -12,6 +15,8 @@ set_up_core_classes
 register_app_auto_loader
 register_shutdown_function
 process_controller
+process_controller_with_value
+execute_controller
 store_syslog
 EOF;
 
@@ -28,11 +33,4 @@ foreach (explode(PHP_EOL, $commands) as $command)
 {
     $closure = include('closures/' . $command . '.php');
     $__results[$command] = $closure($__vals);
-}
-
-foreach ($__vals as $key => $val)
-{
-    echo $key . '<br>';
-    print_r($val);
-    echo '<br>';
 }

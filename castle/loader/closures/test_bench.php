@@ -75,15 +75,17 @@ function send(){
     const content_type = _select_by_name_and_get_value('content_type');
     let sending_data;
     console.log(params);
+    let content_type_header = 'application/x-www-form-urlencoded';
     if (_select_by_name_and_get_value('content_type') === 'form')
     {
+        console.log('form');
         sending_data = _parse_form_urlencoded(params);
     } else {
-        console.log(JSON.stringify(['a', 'hoge']))
         sending_data = JSON.stringify(params);
+        content_type_header = 'application/json;charset=UTF-8';
     }
     let client = new XMLHttpRequest();
-    let content_type_header = 'application/json;charset=UTF-8';
+
     let query = '';
     if (_select_by_name_and_get_value('method') === 'GET' && content_type === 'form')
     {
