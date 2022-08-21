@@ -1,5 +1,6 @@
 <?php
 namespace castle;
+
 return function (array &$vals) : string
 {
     foreach (scandir($vals['syslog_dir']) as $file_name)
@@ -9,13 +10,7 @@ return function (array &$vals) : string
         if (
             unpack('l',
                 _base64_decode_url_safe(
-                    explode(
-                        '|',
-                        explode(
-                            '.',
-                            $file_name
-                        )[0]
-                    )[1]
+                    (string) _explode_recursively(['.', '|'], $file_name)[0][1] ?? 'AAAAAA'
                 )
             )[1] < time()
         )

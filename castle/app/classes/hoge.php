@@ -2,8 +2,8 @@
 
 class Hoge
 {
-    function hoge() : void
+    function hoge() : string
     {
-        echo 'hoge';
+        return 'hoge form hoge class';
     }
 }
