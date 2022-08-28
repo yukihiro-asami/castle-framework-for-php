@@ -8,6 +8,8 @@ Castle
 Controller
 Response
 View
+Database0implement
+Database0implement_PDO
 EOF;
 
     foreach (explode(PHP_EOL, $class_names) as $class_name)

@@ -15,5 +15,6 @@ return function (array &$vals) : string
     $vals['log_file_path'] = $config['castle']['log_file_path'];
     $vals['security.allow_x_headers'] = $config['castle']['security.allow_x_headers'];
     $vals['routes'] = $config['routes'] ?? [];
+    $vals['dbs'] = $config['dbs'] ?? [];
     return 'success';
 };
