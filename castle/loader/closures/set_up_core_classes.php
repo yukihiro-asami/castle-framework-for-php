@@ -10,6 +10,7 @@ Response
 View
 Database0implement
 Database0implement_PDO
+DB
 EOF;
 
     foreach (explode(PHP_EOL, $class_names) as $class_name)

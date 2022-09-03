@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpParameterByRefIsNotUsedAsReferenceInspection */
+
 namespace castle;
 return function (array &$vals) : string
 {

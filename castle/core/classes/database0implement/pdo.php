@@ -10,6 +10,7 @@ class Database0implement_PDO extends Database0implement
     protected string $_sql = '';
     protected array $_params = [];
     protected int $_count = 0;
+    protected array $_result = [];
     public array $_log = [];
     protected string $_error = '';
     const EXECUTE_QUERY = 'execute_query';
@@ -33,12 +34,14 @@ class Database0implement_PDO extends Database0implement
                 'sql'  =>  $this->_sql,
                 'params'  => $this->_params,
                 'count'  =>  $this->_count,
+                'result' => $this->_result,
                 'error'  => $this->_error
             ]
         );
         $this->_sql = '';
         $this->_params = [];
         $this->_count = 0;
+        $this->_result = [];
         $this->_error = '';
     }
     function _log_database(string $operation, array $detail) : void
@@ -79,22 +82,23 @@ class Database0implement_PDO extends Database0implement
      * @throws \Throwable
      * @noinspection PhpFullyQualifiedNameUsageInspection
      */
-    public function execute()
+    public function execute() : array
     {
         if ($this->_pdo === NULL)
             $this->_connect_db();
         try
         {
-            $this->_count = $this->_pdo->prepare($this->_sql)
-                ->execute($this->_params);
+            $pdo_statement = $this->_pdo->prepare($this->_sql);
+            $this->_count = $pdo_statement->execute($this->_params);
+            $result = $this->_result = $pdo_statement->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Throwable $throwable) {
-            echo 're-throw';
             $this->_error = $throwable->getMessage();
             $this->_log_and_init_params_and_query();
             throw $throwable;
         }
         $this->_error = implode(' | ', $this->_pdo->errorInfo());
         $this->_log_and_init_params_and_query();
+        return $result;
     }
     public function quote(string $string) : string
     {
