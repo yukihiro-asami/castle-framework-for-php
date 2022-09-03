@@ -1,7 +1,5 @@
 <?php
 
-use function castle\_explode_recursively;
-
 include('libs/load.php');
 $commands = <<<EOF
 get_syslog_id
@@ -37,3 +35,6 @@ foreach (explode(PHP_EOL, $commands) as $command)
     $closure = include('closures/' . $command . '.php');
     $__results[$command] = $closure($__vals);
 }
+
+echo 'dbs in web<br>';
+print_r($__dbs);
