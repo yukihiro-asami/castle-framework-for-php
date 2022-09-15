@@ -1,6 +1,7 @@
 <?php
 
 include('libs/load.php');
+
 $commands = <<<EOF
 get_syslog_id
 capture_dir
@@ -21,6 +22,7 @@ execute_controller
 store_syslog
 EOF;
 
+/** @noinspection DuplicatedCode */
 $__results = [];
 $__vals = [];
 $__body = '';
@@ -29,9 +31,11 @@ $__status = CSL_HTTP_STATUS_CODE_200_OK;
 $__headers = [];
 $__cookies = [];
 $__dbs = [];
+$__db_logs = [];
 
 foreach (explode(PHP_EOL, $commands) as $command)
 {
+    /** @noinspection PhpIncludeInspection */
     $closure = include('closures/' . $command . '.php');
     $__results[$command] = $closure($__vals);
 }
