@@ -3,6 +3,6 @@ class Test_Hoge extends TestCase
 {
     public function test_hoge1()
     {
-        echo 'hoge hoge';
+        Model_Table_Users::test();
     }
 }

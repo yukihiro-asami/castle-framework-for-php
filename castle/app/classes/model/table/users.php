@@ -1,7 +1,13 @@
 <?php
-class Test_Hoge extends TestCase
+
+class Model_Table_Users extends Table
 {
-    public function test_hoge1() {
+
+    protected static array $_unique_keys = ['name'];
+
+    static function test()
+    {
+        Db::start_transaction();
         $records = [
             ['name' => "あさ\"みん\'", 'address' => 'hoge111', 'age' => 2],
             ['name' => 'あさみん1', 'address' => 'hoge2', 'age' => 2],
@@ -15,15 +21,7 @@ class Test_Hoge extends TestCase
             ['name' => 'あさみん9', 'address' => 'hoge10', 'age' => 10],
             ['name' => 'あさみん10', 'address' => 'hoge11', 'age' => 11]
         ];
-        array_walk(
-            $records,
-            fn($record) =>  \castle\database_implement(0)->store('users', ['name'], $record)
-        );
-    }
-
-    public function test_hoge2() {
-        Db::start_transaction();
-        Db::query("INSERT INTO users SET `name` = 'hoge'")->execute();
-        Db::commit_transaction();
+        static::store_records($records);
+        Db::rollback_transaction();
     }
 }

@@ -52,17 +52,33 @@ abstract class Database0implement extends Castle
 
     abstract public function execute() : array;
 
-    abstract public function quote(string $string) : string;
+    abstract public function quote(mixed $value) : string;
 
     abstract public function start_transaction() : bool;
 
     abstract public function rollback_transaction() : bool;
 
-    abstract public function store(string $table_name, array $unique_keys, array $column_and_values) : bool;
+    public function store(string $table_name, array $unique_keys, array $column_and_values) : bool
+    {
+        $this->query($this->_store_sql($table_name, $unique_keys,$column_and_values))
+            ->execute();
+        return true;
+    }
 
-    abstract public function store_records(string $table_name, array $unique_keys, array $records) : bool;
+    abstract public function _store_sql(string $table_name, array $unique_keys, array $column_and_values) : string;
 
     abstract public function find_by(string $table_name, string $column, string|int $value, string $operator = '=', ?int $limit = NULL, int $offset = 0) : array;
+
+    abstract public function delete_all_data_and_reset_auto_increment(string $table) : bool;
+
+    public function store_records(string $table_name, array $unique_keys, array $records) : bool
+    {
+        $this->query($this->_store_records_sql($table_name, $unique_keys, $records))
+            ->execute();
+        return true;
+    }
+
+    abstract public function _store_records_sql(string $table_name, array $unique_keys, array $records) : string;
 
     public function find_one_by(string $table_name, string $column, string|int $value) : array
     {

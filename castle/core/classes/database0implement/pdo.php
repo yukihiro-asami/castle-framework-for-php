@@ -1,5 +1,6 @@
 <?php /** @noinspection PhpUnused */
 namespace castle;
+use Exception;
 use PDO;
 
 class Database0implement_PDO extends Database0implement
@@ -61,7 +62,6 @@ class Database0implement_PDO extends Database0implement
             $this->_connect_db();
         try
         {
-            echo $this->_sql;
             $pdo_statement = $this->_pdo->prepare($this->_sql);
             $this->_count = $pdo_statement->execute($this->_params);
             $result = $this->_result = $pdo_statement->fetchAll(PDO::FETCH_ASSOC);
@@ -75,11 +75,13 @@ class Database0implement_PDO extends Database0implement
         return $result;
     }
 
-    public function quote(string $string) : string
+    public function quote(mixed $value) : string
     {
+        if (is_string($value) === false)
+            return $value;
         if ($this->_pdo === NULL)
             $this->_connect_db();
-        return $this->_pdo->quote($string);
+        return $this->_pdo->quote($value);
     }
 
     public function start_transaction() : bool
@@ -105,65 +107,84 @@ class Database0implement_PDO extends Database0implement
         return $detail['result'];
     }
 
-    public function store(string $table_name, array $unique_keys, array $column_and_values) : bool
+    public function _store_sql(string $table_name, array $unique_keys, array $column_and_values) : string
     {
-        $columns = [];
-        $values = [];
-        $on_duplicate = [];
-        foreach ($column_and_values as $column => $value)
-        {
-            $columns[] = "`$column`";
-            $values[] = ":$column";
-            if (in_array($column, $unique_keys) === false)
-                $on_duplicate[] = "`$column` = VALUES(`$column`)";
-        }
-        $sql = "INSERT INTO `$table_name` (" . implode(',', $columns) . ") VALUES (" . implode(', ', $values)
-            . ") ON DUPLICATE KEY UPDATE " . implode(',', $on_duplicate);
-        $this->query($sql)->params($column_and_values)->execute();
-        return true;
+        return "INSERT INTO `$table_name` (" .
+            implode(',',
+                array_map(
+                    fn($column) => "`$column`",
+                    array_keys($column_and_values)
+                )
+            ) .
+            ") VALUES (" .
+            implode(', ',
+                array_map(
+                    fn($value) => $this->quote($value),
+                    $column_and_values
+                )
+            ) .
+            ") ON DUPLICATE KEY UPDATE " .
+            implode(', ',
+                array_map(
+                    fn($column_name) => "`$column_name` = VALUES(`$column_name`)",
+                    array_diff(array_keys($column_and_values), $unique_keys)
+                )
+            );
     }
 
-    public function store_records(string $table_name, array $unique_keys, array $records): bool
+    /**
+     * @throws Exception
+     */
+    public function _store_records_sql(string $table_name, array $unique_keys, array $records): string
     {
-        $columns = [];
-        $sql_records = [];
-        $on_duplicate = [];
         if (count($records) > static::STORE_RECORDS_MAX_COUNT)
-            throw new \Exception();
-        foreach (array_keys($records[0]) as $column)
-        {
-            $columns[] = "`$column`";
-            if (in_array($column, $unique_keys) === false)
-                $on_duplicate[] = "`$column` = VALUES(`$column`)";
+            throw new Exception();
+        if (isset($records[0]) === true) {
+            $column_names = array_keys($records[0]);
+        } else {
+            throw new Exception();
         }
-        foreach ($records as $record)
-        {
-            $processed_records = [];
-            foreach (array_keys($records[0]) as $column)
-            {
-                if (gettype($record[$column]) === 'string')
-                {
-                    $processed_records[$column] = $this->quote($record[$column]);
-                } else {
-                    $processed_records[$column] = $record[$column];
-                }
-            }
-            $sql_records[] = '(' . implode(', ', $processed_records) . ')';
-        }
-        $sql = "INSERT INTO `$table_name` (" . implode(',', $columns) . ") VALUES " . implode(', ', $sql_records)
-        . " ON DUPLICATE KEY UPDATE " . implode(',', $on_duplicate);
-        echo $sql;
-        $this->query($sql)->execute();
-        return true;
+        return "INSERT INTO `$table_name` (" .
+            implode(',',
+                array_map(
+                    fn($column_name) => "`$column_name`",
+                    $column_names
+                )
+            ) .
+            ") VALUES " .
+            implode(', ',
+                array_map(
+                    fn ($record) => '(' . implode(', ', array_map(fn($value) => $this->quote($value), $record)) . ')',
+                    $records
+                )
+            )
+        . " ON DUPLICATE KEY UPDATE " .
+            implode(', ',
+                array_map(
+                    fn($column_name) => "`$column_name` = VALUES(`$column_name`)",
+                    array_diff($column_names, $unique_keys)
+                )
+            );
     }
 
     public function find_by(string $table_name, string $column, string|int $value, string $operator = '=', ?int $limit = NULL, int $offset = 0) : array
     {
-        $sql = "SELECT * FROM `$table_name` WHERE :column $operator :value"
+        $sql = "SELECT * FROM `$table_name` WHERE `$column` $operator :value"
             . ($limit === NULL ? '' : " limit $limit")
             . ($offset === 0 ? '' : " offset $offset");
-        echo $sql;
-        return $this->query($sql)->params(['column'  =>  $column, 'value'  => $value])->execute();
+        return $this->query($sql)->params(['value'  => $value])->execute();
     }
 
+    public function delete_all_data_and_reset_auto_increment(string $table): bool
+    {
+        $sql = <<<EOF
+DELETE FROM $table;
+EOF;
+        $this->query($sql)->execute();
+        $sql = <<<EOF
+ALTER TABLE $table AUTO_INCREMENT = 1;
+EOF;
+        $this->query($sql)->execute();
+        return true;
+    }
 }
