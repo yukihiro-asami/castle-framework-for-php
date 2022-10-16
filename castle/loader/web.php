@@ -12,6 +12,7 @@ capture_php_input
 process_params
 set_up_core_classes
 register_app_auto_loader
+process_cookie
 set_up_database
 register_exception_handler
 register_error_handler
@@ -39,6 +40,3 @@ foreach (explode(PHP_EOL, $commands) as $command)
     $closure = include('closures/' . $command . '.php');
     $__results[$command] = $closure($__vals);
 }
-
-echo 'dbs in web<br>';
-print_r($__dbs);

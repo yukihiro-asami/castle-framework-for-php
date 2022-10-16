@@ -16,5 +16,6 @@ return function (array &$vals) : string
     $vals['security.allow_x_headers'] = $config['castle']['security.allow_x_headers'];
     $vals['routes'] = $config['routes'] ?? [];
     $vals['dbs'] = $config['dbs'] ?? [];
+    $vals['cookie'] = $config['cookie'] ?? [];
     return 'success';
 };

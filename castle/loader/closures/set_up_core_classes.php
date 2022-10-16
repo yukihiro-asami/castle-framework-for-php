@@ -6,6 +6,7 @@ return function (array &$vals) : string
     $class_names = <<<EOF
 Castle
 Controller
+Credential
 Response
 View
 Database0implement
