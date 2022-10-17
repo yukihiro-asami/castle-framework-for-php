@@ -6,9 +6,13 @@ return function (array &$vals) : string
     $callback = function ($errno, $errstr, $errfile, $errline) use ($vals)
 {
     $path = $vals['views_dir'] . 'castle/__503__.php';
-    echo view(['message' => $errno . $errstr], $path);
+    $params = [
+        'message' => $errno . $errstr,
+        'file' => $errfile . '(' . $errline . ')',
+    ];
+    echo view($params, $path);
     die;
 };
-    set_error_handler($callback);
+    //set_error_handler($callback);
     return 'success';
 };

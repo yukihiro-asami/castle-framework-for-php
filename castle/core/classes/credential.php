@@ -16,7 +16,7 @@ class Credential extends Castle
     static function get_cookie(string $cookie_name) : array|string
     {
         $cookie_value = array_key_exists($cookie_name, static::_captured_cookie_values()) ? static::_captured_cookie_values()[$cookie_name] : '';
-        $cookie_value = static::_is_cookie_encrypted() ? secret_box_open(static::_cookie()['encrypt'], $cookie_value) : $cookie_value;
+        $cookie_value = static::_is_cookie_encrypted() ? secret_box_open($cookie_value, static::_cookie()['encrypt_key']) : $cookie_value;
         return json_decode($cookie_value, true) ?? $cookie_value;
     }
 

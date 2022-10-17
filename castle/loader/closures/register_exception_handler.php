@@ -8,6 +8,6 @@ return function (array &$vals) : string
     echo view(['message' => $t->getMessage()], $path);
     return true;
 };
-    set_exception_handler($callback);
+    //set_exception_handler($callback);
     return 'success';
 };
