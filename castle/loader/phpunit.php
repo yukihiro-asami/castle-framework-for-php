@@ -5,11 +5,13 @@ $commands = <<<EOF
 capture_dir
 config_setup
 set_up_core_classes
+process_cookie
 register_app_auto_loader
 set_up_database
 EOF;
-global $__results, $__vals, $__body, $__protocol, $__status, $__headers, $__cookies, $__dbs;
+global $__is_php_unit, $__results, $__vals, $__body, $__protocol, $__status, $__headers, $__cookies, $__dbs;
 /** @noinspection DuplicatedCode */
+$__is_phpunit = true;
 $__results = [];
 $__vals = [];
 $__body = '';

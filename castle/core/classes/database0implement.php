@@ -84,4 +84,14 @@ abstract class Database0implement extends Castle
     {
         return static::find_by($table_name, $column, $value, '=', 1);
     }
+
+    public function update_by_key(string $table_name, int $primary_key, array $fields, string $primary_key_name = 'id') : bool
+    {
+        $this->query($this->_update_by_key_sql($table_name, $primary_key, $fields))
+            ->execute();
+        return true;
+    }
+
+    abstract public function _update_by_key_sql(string $table_name, int $primary_key, array $fields, string $primary_key_name = 'id') : string;
+
 }

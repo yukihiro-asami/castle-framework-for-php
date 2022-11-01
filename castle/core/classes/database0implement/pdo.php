@@ -187,4 +187,17 @@ EOF;
         $this->query($sql)->execute();
         return true;
     }
+
+    public function _update_by_key_sql(string $table_name, int $primary_key, array $fields, string $primary_key_name = 'id'): string
+    {
+        return "UPDATE `" . $table_name . "` SET " .
+            implode(', ',
+                array_map(
+                    fn($key, $value) => "`$key` = " . $this->quote($value),
+                    array_keys($fields),
+                    array_values($fields)
+                )
+            ) .
+            " WHERE `$primary_key_name` = " . $primary_key;
+    }
 }

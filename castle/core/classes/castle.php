@@ -2,12 +2,12 @@
 namespace castle;
 class Castle
 {
-    protected function _log_info(\Throwable|string $message) : void
+    static protected function _log_info(\Throwable|string $message) : void
     {
         static::_log($message, '__INFO__');
     }
 
-    protected function _log(\Throwable|string $message, string $lebel) : void
+    static protected function _log(\Throwable|string $message, string $lebel) : void
     {
         if ($message instanceof \Throwable)
         {
@@ -44,12 +44,17 @@ class Castle
         return static::_value(__FUNCTION__);
     }
 
-    protected static function _cookie() : array
+    protected static function _cookie_setting() : array
     {
         return static::_value(__FUNCTION__);
     }
 
     protected static function _captured_cookie_values() : array
+    {
+        return static::_value(__FUNCTION__);
+    }
+
+    protected static function _credential() : array
     {
         return static::_value(__FUNCTION__);
     }

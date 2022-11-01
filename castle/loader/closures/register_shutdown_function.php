@@ -7,15 +7,16 @@ return function (array &$vals) : string
     register_shutdown_function(
         function () use ($vals)
         {
-            global $__body, $__cookies;
-            array_map(
-                function ($cookie_name, $cookie_values) use ($vals)
-                {
-                    setcookie($cookie_name, $cookie_values['value'], $cookie_values['expires'], $cookie_values['path'], $cookie_values['domain']);
-                },
-                array_keys($__cookies),
-                array_values($__cookies)
-            );
+            if(is_phpunit_mode() === false) {
+                global $__body, $__cookies;
+                array_map(
+                    function ($cookie_name, $cookie_values) use ($vals) {
+                        setcookie($cookie_name, $cookie_values['value'], $cookie_values['expires'], $cookie_values['path'], $cookie_values['domain']);
+                    },
+                    array_keys($__cookies),
+                    array_values($__cookies)
+                );
+            }
             echo $__body;
         }
     );
