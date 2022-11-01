@@ -110,7 +110,6 @@ class Credential0implement extends Castle
                 'rotated_at'  => time()
             ];
             $this->_database0implement->update_by_key($this->_session_table_name, $this->_session_id, $params);
-            $this->_session_cookie();
         }
         $this->set_cookie($this->_session_cookie_name, $session_token);
         return [true, ['user_id' => $this->_user_id]];
@@ -183,11 +182,6 @@ class Credential0implement extends Castle
     {
         store_cookie($cookie_name, '', time() - static::COOKIE_DELETE_SEC);
         return true;
-    }
-
-    function _session_cookie() : string
-    {
-        return static::get_cookie(static::_credential()['session_info']);
     }
 
     function _is_ip_addresses_identical(string $ip_address_1, string $is_address_2, int $mask) : bool

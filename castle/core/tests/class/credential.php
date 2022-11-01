@@ -55,9 +55,13 @@ class Test_Class_Credential extends TestCase
         $pw_2 = 'ほげほげ';
         $pw_hash_2 = $credential0implement->_password_hash($pw_2);
         $this->assertFalse($pw_hash_2);
-        $pw_3 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
-        $pw_hash_3 = $credential0implement->_password_hash($pw_1);
-        $is_string = $is_string($pw_hash_3);
-
+        $pw_3 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+        $pw_hash_3 = $credential0implement->_password_hash($pw_3);
+        $is_string = is_string($pw_hash_3);
+        $this->assertFalse($is_string);
+        $pw_4 = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+        echo $pw_hash_4 = $credential0implement->_password_hash($pw_4);
+        $is_string_2 = is_string($pw_hash_4);
+        $this->assertTrue($is_string_2);
     }
 }
