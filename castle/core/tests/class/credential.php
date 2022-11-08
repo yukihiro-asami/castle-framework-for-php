@@ -64,4 +64,39 @@ class Test_Class_Credential extends TestCase
         $is_string_2 = is_string($pw_hash_4);
         $this->assertTrue($is_string_2);
     }
+
+    function test_cookie()
+    {
+        global $__vals;
+        $__vals['captured_cookie_values'] = ['hoge'  =>  'hogehoge'];
+        $credential0implement = new \castle\Credential0implement();
+        echo $credential0implement->get_cookie('hoge') . PHP_EOL;
+    }
+
+    function test_init_session()
+    {
+        global $__vals;
+        $__vals['captured_cookie_values'] = ['session_info'  =>  'hogehoge'];
+        $credential0implement = new \castle\Credential0implement();
+        echo $credential0implement->_current_session_token . PHP_EOL;
+    }
+
+    function test_session_store_and_find()
+    {
+        $token = 'hogehoge';
+        $fields = ['token' => $token, 'is_logged_in' => 1, 'user_id' => 10, 'rotated_at' => time()];
+        $credential0implement = new \castle\Credential0implement();
+        $credential0implement->_store_session($fields);
+        $result = $credential0implement->_find_session_by_token($token);
+        print_r($result);
+        $fields_2 = ['token' => $token, 'is_logged_in' => 0, 'user_id' => 0, 'rotated_at' => 0];
+        $credential0implement->_store_session($fields_2);
+        $result = $credential0implement->_find_session_by_token($token);
+        print_r($result);
+        $token_2 = 'hagehage';
+        $fields_3 = ['token' => $token_2, 'is_logged_in' => 1, 'user_id' => 10, 'rotated_at' => time()];
+        $credential0implement->_update_session($result['id'], $fields_3);
+        $result = $credential0implement->_find_session_by_token($token_2);
+        print_r($result);
+    }
 }

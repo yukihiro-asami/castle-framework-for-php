@@ -14,6 +14,7 @@ set_up_core_classes
 register_app_auto_loader
 process_cookie
 set_up_database
+set_up_credential
 register_exception_handler
 register_error_handler
 register_shutdown_function
@@ -33,6 +34,7 @@ $__headers = [];
 $__cookies = [];
 $__dbs = [];
 $__db_logs = [];
+$__credential = NULL;
 
 foreach (explode(PHP_EOL, $commands) as $command)
 {

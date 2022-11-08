@@ -6,24 +6,23 @@ class Credential0implement extends Castle
 {
     CONST COOKIE_DELETE_SEC = 3600;
     CONST MAX_PASSWORD_LENGTH = 128;
-    private string $_user_table_name;
-    private string $_session_table_name;
-    private string $_session_cookie_name;
-    private int $_session_rotation_time;
-    private string $_session_cookie_expiration_time;
-    private bool $_remember_me_enabled;
-    private string $_remember_me_cookie_name;
-    private int $_remember_me_expiration;
-    private bool $_remember_me_match_ip;
-    private bool $_remember_me_match_ip_mask;
-    private bool $_multiple_logins;
-    private bool $_is_cookie_encrypted;
-    private bool $_is_checked = false;
-    private ?int $_user_id = NULL;
-    private ?string $_current_session_token = NULL;
-    private ?int $_session_id = NULL;
-    private ?array $_remember_me = NULL;
-    private ?Database0implement $_database0implement = NULL;
+    public string $_user_table_name;
+    public string $_session_table_name;
+    public string $_session_cookie_name;
+    public int $_session_rotation_time;
+    public string $_session_cookie_expiration_time;
+    public bool $_remember_me_enabled;
+    public string $_remember_me_cookie_name;
+    public int $_remember_me_expiration;
+    public bool $_remember_me_match_ip;
+    public bool $_remember_me_match_ip_mask;
+    public bool $_multiple_logins;
+    public bool $_is_cookie_encrypted;
+    public ?int $_user_id = NULL;
+    public ?string $_current_session_token = NULL;
+    public ?int $_session_id = NULL;
+    public ?array $_remember_me = NULL;
+    public ?Database0implement $_database0implement = NULL;
 
     function __construct()
     {
@@ -47,11 +46,9 @@ class Credential0implement extends Castle
 
     function login($user_name, $password) : bool
     {
-        $user = static::_find_user_by_name($user_name);
+        $user = $this->_find_user_by_name($user_name);
         if (static::_verify_password_hash($user['password_hash'], $password) === false)
             return false;
-        if ($this->_is_checked === false)
-            $this->check();
         $session_token = generate_token();
         $params = [
             'token'  => $session_token,
@@ -79,8 +76,6 @@ class Credential0implement extends Castle
 
     function logout($user_name) : bool
     {
-        if ($this->_is_checked === false)
-            $this->check();
         if ($this->_user_id === NULL)
             return true;
         $params = [
@@ -94,8 +89,7 @@ class Credential0implement extends Castle
 
     function check() : array
     {
-        $this->_is_checked = true;
-        $session = $this->_find_session_by_token();
+        $session = $this->_find_session_by_token($this->_current_session_token);
         if (count($session) === 0)
             return [false, []];
         $this->_session_id = $session['id'];
@@ -121,12 +115,26 @@ class Credential0implement extends Castle
             ->find_one_by($this->_user_table_name, 'name', $name);
     }
 
-    function _find_session_by_token() : array
+    function _find_session_by_token(string $session_token) : array
     {
-        if ($this->_session_id === NULL)
-            return [];
         return database_implement(CSL_DB_INSTANCE_PRIMARY)
-            ->find_one_by($this->_session_table_name, 'token', $this->_current_session_token);
+            ->find_one_by($this->_session_table_name, 'token', $session_token);
+    }
+
+    function _update_session(int $id, array $fields)
+    {
+        $this->_database0implement
+            ->update_by_key($this->_session_table_name, $id, $fields);
+    }
+
+    function _store_session(array $params)
+    {
+        $this->_database0implement
+            ->store(
+                $this->_session_table_name,
+                ['token'],
+                $params
+            );
     }
 
     function _password_hash(string $password) : string|bool
@@ -157,17 +165,16 @@ class Credential0implement extends Castle
 
     function _retrieve_session() : array
     {
-        $session_id = static::_credential()['session_cookie_name']['session_id'];
         return database_implement(CSL_DB_INSTANCE_PRIMARY)
-            ->find_one_by(static::_credential()['session_table_name'], 'name', $session_id);
+            ->find_one_by(static::_credential()['session_table_name'], 'token', $this->_current_session_token);
     }
 
-    function set_cookie(string $cookie_name, array|string $value, $expiration = 3600) : bool
+    function set_cookie(string $cookie_name, array|string $value, int $expiration = 3600, string $path = '', string $domain = '') : bool
     {
         $value = is_array($value) ? json_encode($value) : $value;
         if ($this->_is_cookie_encrypted === true)
-            $value = secret_box($value, static::_captured_cookie_values()['encrypt_key']);
-        store_cookie($cookie_name, $value, time() + $expiration);
+            $value = secret_box($value, static::_cookie_setting()['encrypt_key']);
+        store_cookie($cookie_name, $value, time() + $expiration, $path, $domain);
         return true;
     }
 
