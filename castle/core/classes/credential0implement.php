@@ -1,5 +1,6 @@
 <?php /** @noinspection PhpUnused */
 namespace castle;
+use PHPUnit\phpDocumentor\Reflection\Types\Null_;
 use Throwable;
 
 class Credential0implement extends Castle
@@ -23,6 +24,8 @@ class Credential0implement extends Castle
     public ?int $_session_id = NULL;
     public ?array $_remember_me = NULL;
     public ?Database0implement $_database0implement = NULL;
+    public ?string $_received_session_token = NULL;
+    public ?string $_session_token = NULL;
 
     function __construct()
     {
@@ -31,142 +34,51 @@ class Credential0implement extends Castle
         $this->_session_cookie_name = static::_credential()['session_cookie_name'];
         $this->_session_rotation_time = (int) static::_credential()['session_rotation_time'];
         $this->_session_cookie_expiration_time = static::_credential()['session_cookie_expiration_time'];
-        $this->_remember_me_enabled = static::_credential()['remember_me_enabled'];
-        $this->_remember_me_cookie_name = static::_credential()['remember_me_cookie_name'];
-        $this->_remember_me_expiration = static::_credential()['remember_me_expiration'];
-        $this->_remember_me_match_ip = static::_credential()['remember_me_match_ip'];
-        $this->_remember_me_match_ip_mask = static::_credential()['remember_me_match_ip_mask'];
         $this->_multiple_logins = static::_credential()['multiple_logins'];
         $this->_is_cookie_encrypted = static::_cookie_setting()['encrypt'];
-        $this->_current_session_token = $this->get_cookie($this->_session_cookie_name);
-        $remember_me = $this->get_cookie($this->_remember_me_cookie_name);
-        $this->_remember_me = $remember_me === '' ? [] : $remember_me;
+        $this->_received_session_token = $this->get_cookie($this->_session_cookie_name);
+        static::_log_info('_received_session_token:' . $this->_received_session_token);
         $this->_database0implement = database_implement(CSL_DB_INSTANCE_PRIMARY);
-    }
-
-    function login($user_name, $password) : bool
-    {
-        $user = $this->_find_user_by_name($user_name);
-        if (static::_verify_password_hash($user['password_hash'], $password) === false)
-            return false;
-        $session_token = generate_token();
-        $params = [
-            'token'  => $session_token,
-            'user_id' => $user['id'],
-            'rotated_at' => time()
-        ];
-        if ($this->_session_id === NULL) {
-            $this->_database0implement
-                ->store(
-                    $this->_session_table_name,
-                    ['token' => $session_token],
-                    $params
-                );
-        } else {
-            $this->_database0implement
-            ->update_by_key(
-                $this->_session_table_name,
-                $this->_session_id,
-                $params
-            );
-        }
-        $this->set_cookie($this->_session_cookie_name, $session_token);
-        return true;
-    }
-
-    function logout($user_name) : bool
-    {
-        if ($this->_user_id === NULL)
-            return true;
-        $params = [
-            'rotated_at'  => 0,
-            'is_logged_in'  => 0,
-            'user_id'  => 0
-        ];
-        $this->_database0implement->update_by_key($this->_session_table_name, $this->_session_id, $params);
-        return true;
-    }
-
-    function check() : array
-    {
-        $session = $this->_find_session_by_token($this->_current_session_token);
-        if (count($session) === 0)
-            return [false, []];
-        $this->_session_id = $session['id'];
-        if ($session['user_id'] === '')
-            return [false, []];
-        $this->_user_id = $session['user_id'];
-        $session_token = generate_token();
-        if ((int) $session['rotated_at'] + $this->_session_rotation_time > time())
+        $session = [];
+        if ($this->_received_session_token !== '')
+            $session = $this->_find_session_by_token($this->_received_session_token);
+        if ($this->_received_session_token === '' OR array_key_exists('id', $session) === false)
         {
+            $this->_session_token = generate_token();
+            $this->set_cookie($this->_session_cookie_name, $this->_session_token, $this->_session_cookie_expiration_time);
             $params = [
-                'token'  => generate_token(),
-                'rotated_at'  => time()
+                'token' => $this->_session_token,
+                'rotated_at' => time()
             ];
-            $this->_database0implement->update_by_key($this->_session_table_name, $this->_session_id, $params);
-        }
-        $this->set_cookie($this->_session_cookie_name, $session_token);
-        return [true, ['user_id' => $this->_user_id]];
-    }
-
-    function _find_user_by_name(string $name) : array
-    {
-        return database_implement(CSL_DB_INSTANCE_PRIMARY)
-            ->find_one_by($this->_user_table_name, 'name', $name);
-    }
-
-    function _find_session_by_token(string $session_token) : array
-    {
-        return database_implement(CSL_DB_INSTANCE_PRIMARY)
-            ->find_one_by($this->_session_table_name, 'token', $session_token);
-    }
-
-    function _update_session(int $id, array $fields)
-    {
-        $this->_database0implement
-            ->update_by_key($this->_session_table_name, $id, $fields);
-    }
-
-    function _store_session(array $params)
-    {
-        $this->_database0implement
-            ->store(
-                $this->_session_table_name,
-                ['token'],
-                $params
-            );
-    }
-
-    function _password_hash(string $password) : string|bool
-    {
-        if (mb_check_encoding($password, 'ASCII') === false)
-            return false;
-        if (strlen($password) > self::MAX_PASSWORD_LENGTH)
-            return false;
-        try
-        {
-            return sodium_crypto_pwhash_str($password, SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE, SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE);
-        } catch (Throwable $t) {
-            static::_log_info($t);
-            return false;
+            $this->_store_session($params);
+        } else {
+            if (array_key_exists('id', $session) === true)
+            {
+                $this->_session_id = $session['id'];
+                if ((int) $session['is_logged_in'] === 1)
+                    $this->_user_id = (int) $session['user_id'];
+                if (time() > (int) $session['rotated_at'] + $this->_session_rotation_time)
+                {
+                    $this->_session_token = generate_token();
+                    $params = [
+                        'token' => $this->_session_token,
+                        'rotated_at' => time()
+                    ];
+                    $this->_update_session($this->_session_id, $params);
+                    $this->set_cookie($this->_session_cookie_name, $this->_session_token, $this->_session_cookie_expiration_time);
+                }
+            }
         }
     }
 
-    function _verify_password_hash(string $hash, string $password) : bool
+    function check() : bool
     {
-        try
-        {
-            return sodium_crypto_pwhash_str_verify($hash, $password);
-        } catch (Throwable $t) {
-            static::_log_info($t);
-            return false;
-        }
+        return is_int($this->_user_id);
     }
 
-    function _retrieve_session() : array
+    function get_user_id() : ?int
     {
-        return database_implement(CSL_DB_INSTANCE_PRIMARY)
-            ->find_one_by(static::_credential()['session_table_name'], 'token', $this->_current_session_token);
+        return $this->_user_id;
     }
 
     function set_cookie(string $cookie_name, array|string $value, int $expiration = 3600, string $path = '', string $domain = '') : bool
@@ -201,6 +113,56 @@ class Credential0implement extends Castle
             $is_address_int_2_shifted = $ip_address_int_2 >> (32 - $mask);
             return $ip_address_int_1_shifted === $is_address_int_2_shifted;
         } else {
+            return false;
+        }
+    }
+
+    function _find_session_by_token(string $session_token) : array
+    {
+        return database_implement(CSL_DB_INSTANCE_PRIMARY)
+            ->find_one_by($this->_session_table_name, 'token', $session_token);
+    }
+
+    function _update_session(int $id, array $fields)
+    {
+        static::_log_info('_update_session');
+        $this->_database0implement
+            ->update_by_key($this->_session_table_name, $id, $fields);
+    }
+
+    function _store_session(array $params) : void
+    {
+        static::_log_info('_store_session');
+        $this->_database0implement
+            ->store(
+                $this->_session_table_name,
+                ['token'],
+                $params
+            );
+    }
+
+    function _password_hash(string $password) : string|bool
+    {
+        if (mb_check_encoding($password, 'ASCII') === false)
+            return false;
+        if (strlen($password) > self::MAX_PASSWORD_LENGTH)
+            return false;
+        try
+        {
+            return sodium_crypto_pwhash_str($password, SODIUM_CRYPTO_PWHASH_OPSLIMIT_INTERACTIVE, SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE);
+        } catch (Throwable $t) {
+            static::_log_info($t);
+            return false;
+        }
+    }
+
+    function _verify_password_hash(string $hash, string $password) : bool
+    {
+        try
+        {
+            return sodium_crypto_pwhash_str_verify($hash, $password);
+        } catch (Throwable $t) {
+            static::_log_info($t);
             return false;
         }
     }

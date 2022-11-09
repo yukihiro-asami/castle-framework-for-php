@@ -82,12 +82,17 @@ abstract class Database0implement extends Castle
 
     public function find_one_by(string $table_name, string $column, string|int $value) : array
     {
-        return static::find_by($table_name, $column, $value, '=', 1)[0];
+        $result = static::find_by($table_name, $column, $value, '=', 1);
+        if (count($result) === 1)
+            return $result[0];
+        return [];
     }
 
     public function update_by_key(string $table_name, int $primary_key, array $fields, string $primary_key_name = 'id') : bool
     {
-        $this->query($this->_update_by_key_sql($table_name, $primary_key, $fields))
+        $sql = $this->_update_by_key_sql($table_name, $primary_key, $fields);
+        static::_log_info($sql);
+        $this->query($sql)
             ->execute();
         return true;
     }

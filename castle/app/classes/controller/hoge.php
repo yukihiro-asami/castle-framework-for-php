@@ -3,8 +3,16 @@ class Controller_Hoge extends Controller
 {
     function get_index(string $hoge = ' no param')
     {
-        Cookie::set('hoge', ['hoge' => 'hogehoge']);
-        $cookie = json_encode(Cookie::get('hoge'));
-        return Response::forge(View::forge($this->_view_filename, ['value' => $cookie]));
+        global $__credential;
+        $is_logged_in = $__credential->check() ? 'true' : 'false';
+        $user_id = $__credential->get_user_id();
+        return Response::forge(
+            View::forge($this->_view_filename,
+            [
+                'is_logged_in' => $is_logged_in,
+                'user_id' => $user_id
+            ]
+            )
+        );
     }
 }
