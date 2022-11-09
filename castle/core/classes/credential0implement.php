@@ -80,6 +80,12 @@ class Credential0implement extends Castle
         return true;
     }
 
+    function logout() : bool
+    {
+        $this->_store_session(['token' => $this->_session_token, 'is_logged_in' => 0, 'user_id' => 0]);
+        return true;
+    }
+
     function validate_user(string $user_name = '', string $password = '') : bool|array
     {
         $user = static::_find_user_by_name($user_name);
