@@ -120,4 +120,44 @@ class Test_Class_Credential extends TestCase
         $user = $credential0implement->_find_user_by_name($name);
         print_r($user);
     }
+
+    function test_user()
+    {
+        $name = 'hogehoge';
+        $pass_word = 'hoge1234';
+        $credential0implement = new \castle\Credential0implement();
+        $params = [
+            'name' => $name,
+            'password_hash' =>  $credential0implement->_password_hash($pass_word)
+        ];
+
+        /** @noinspection DuplicatedCode */
+        $credential0implement->_store_user($params);
+        $user = $credential0implement->_find_user_by_name($name);
+        $result_1 = $credential0implement->_verify_password_hash($user['password_hash'], $pass_word);
+        $this->assertTrue($result_1);
+        $result_2 = $credential0implement->_verify_password_hash($user['password_hash'] . 'hage', $pass_word);
+        $this->assertFalse($result_2);
+    }
+
+    function test_validate_user()
+    {
+        $name = 'hogehoge';
+        $pass_word = 'hoge1234';
+        $credential0implement = new \castle\Credential0implement();
+        $params = [
+            'name' => $name,
+            'password_hash' =>  $credential0implement->_password_hash($pass_word)
+        ];
+
+        /** @noinspection DuplicatedCode */
+        $credential0implement->_store_user($params);
+
+        $result_1 = $credential0implement->validate_user($name, $pass_word);
+        $this->assertIsArray($result_1);
+        $result_2 = $credential0implement->_verify_password_hash($name . 'hage', $pass_word);
+        $this->assertFalse($result_2);
+        $result_3 = $credential0implement->_verify_password_hash($name, $pass_word  . 'hage');
+        $this->assertFalse($result_3);
+    }
 }
