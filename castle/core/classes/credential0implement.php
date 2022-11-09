@@ -37,7 +37,6 @@ class Credential0implement extends Castle
         $this->_multiple_logins = static::_credential()['multiple_logins'];
         $this->_is_cookie_encrypted = static::_cookie_setting()['encrypt'];
         $this->_received_session_token = $this->get_cookie($this->_session_cookie_name);
-        static::_log_info('_received_session_token:' . $this->_received_session_token);
         $this->_database0implement = database_implement(CSL_DB_INSTANCE_PRIMARY);
         $session = [];
         if ($this->_received_session_token !== '')
@@ -69,6 +68,16 @@ class Credential0implement extends Castle
                 }
             }
         }
+    }
+
+    function validate_user(string $user_name = '', string $password = '') : bool|array
+    {
+        $user = static::_find_user_by_name($user_name);
+        if ($user === [])
+            return false;
+        if (static::_verify_password_hash($user['password_hash'], $password) ===false)
+            return false;
+        return $user;
     }
 
     function check() : bool
@@ -117,6 +126,28 @@ class Credential0implement extends Castle
         }
     }
 
+    function _update_user(int $id, array $fields)
+    {
+        $this->_database0implement
+            ->update_by_key($this->_user_table_name, $id, $fields);
+    }
+
+    function _store_user(array $params) : void
+    {
+        $this->_database0implement
+            ->store(
+                $this->_user_table_name,
+                ['name'],
+                $params
+            );
+    }
+
+    function _find_user_by_name(string $name) : array
+    {
+        return database_implement(CSL_DB_INSTANCE_PRIMARY)
+            ->find_one_by($this->_user_table_name, 'name', $name);
+    }
+
     function _find_session_by_token(string $session_token) : array
     {
         return database_implement(CSL_DB_INSTANCE_PRIMARY)
@@ -125,14 +156,12 @@ class Credential0implement extends Castle
 
     function _update_session(int $id, array $fields)
     {
-        static::_log_info('_update_session');
         $this->_database0implement
             ->update_by_key($this->_session_table_name, $id, $fields);
     }
 
     function _store_session(array $params) : void
     {
-        static::_log_info('_store_session');
         $this->_database0implement
             ->store(
                 $this->_session_table_name,

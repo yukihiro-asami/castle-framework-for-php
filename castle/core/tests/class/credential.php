@@ -99,4 +99,25 @@ class Test_Class_Credential extends TestCase
         $result = $credential0implement->_find_session_by_token($token_2);
         print_r($result);
     }
+
+    function test_3()
+    {
+        $name = 'hogehoge';
+        $credential0implement = new \castle\Credential0implement();
+        $params = [
+           'name' => $name,
+           'password_hash' =>  'hagehage'
+        ];
+        $credential0implement->_store_user($params);
+        $user = $credential0implement->_find_user_by_name($name);
+        print_r($user);
+        $name = $name . '1';
+        $params = [
+            'name' => $name,
+            'password_hash' =>  'hagehage2'
+        ];
+        $credential0implement->_update_user($user['id'], $params);
+        $user = $credential0implement->_find_user_by_name($name);
+        print_r($user);
+    }
 }

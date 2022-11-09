@@ -91,7 +91,6 @@ abstract class Database0implement extends Castle
     public function update_by_key(string $table_name, int $primary_key, array $fields, string $primary_key_name = 'id') : bool
     {
         $sql = $this->_update_by_key_sql($table_name, $primary_key, $fields);
-        static::_log_info($sql);
         $this->query($sql)
             ->execute();
         return true;

@@ -20,6 +20,8 @@ $__status = CSL_HTTP_STATUS_CODE_200_OK;
 $__headers = [];
 $__cookies = [];
 $__dbs = [];
+$__db_logs = [];
+$__credential = NULL;
 foreach (explode(PHP_EOL, $commands) as $command)
 {
     $closure = include('closures/' . $command . '.php');
