@@ -28,6 +28,8 @@ class Credential0implement extends Castle
     public ?Database0implement $_database0implement = NULL;
     public ?string $_received_session_token = NULL;
     public ?string $_session_token = NULL;
+    public ?string $_ip_address_must_be = NULL;
+    public ?string $_user_agent_must_be = NULL;
 
     function __construct(bool $is_web_access= true)
     {
@@ -60,6 +62,8 @@ class Credential0implement extends Castle
             if (array_key_exists('id', $session) === true)
             {
                 $this->_session_id = $session['id'];
+                $this->_ip_address_must_be = $session['ip_address'];
+                $this->_user_agent_must_be = $session['user_agent'];
                 if ((int) $session['is_logged_in'] === 1)
                     $this->_user_id = (int) $session['user_id'];
                 if (time() > (int) $session['rotated_at'] + $this->_session_rotation_time)
@@ -83,14 +87,32 @@ class Credential0implement extends Castle
         $user = $this->validate_user($user_name, $password);
         if ($user === false)
             return false;
-        $this->_store_session(['token' => $this->_session_token, 'is_logged_in' => 1, 'user_id' => $user['id']]);
+        $ip_address = static::_remote_addr();
+        $user_agent = static::_user_agent();
+        $this->_store_session(
+            [
+                'token' => $this->_session_token,
+                'is_logged_in' => 1,
+                'user_id' => $user['id'],
+                'user_agent' => $user_agent,
+                'ip_address' => $ip_address
+            ]
+        );
         $this->_user_id = $user['id'];
         return true;
     }
 
     function logout() : bool
     {
-        $this->_store_session(['token' => $this->_session_token, 'is_logged_in' => 0, 'user_id' => 0]);
+        $this->_store_session(
+            [
+                'token' => $this->_session_token,
+                'is_logged_in' => 0,
+                'user_id' => 0,
+                'user_agent' => '',
+                'ip_address' => ''
+            ]
+        );
         return true;
     }
 
@@ -106,7 +128,9 @@ class Credential0implement extends Castle
 
     function check() : bool
     {
-        return is_int($this->_user_id);
+        return is_int($this->_user_id)
+            AND static::_user_agent() === $this->_user_agent_must_be
+            AND $this->_is_ip_addresses_identical(static::_remote_addr(), $this->_ip_address_must_be, $this->_session_ip_mask);
     }
 
     function get_user_id() : int|bool

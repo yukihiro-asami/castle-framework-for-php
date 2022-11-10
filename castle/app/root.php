@@ -6,4 +6,5 @@ class Cookie extends \castle\Cookie {};
 class View extends \castle\View {};
 class Testcase extends PHPUnit\Framework\TestCase {}
 class DB extends \castle\DB {};
+class Input extends \castle\Input {};
 class Table extends \castle\Table{}
