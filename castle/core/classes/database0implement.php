@@ -98,4 +98,13 @@ abstract class Database0implement extends Castle
 
     abstract public function _update_by_key_sql(string $table_name, int $primary_key, array $fields, string $primary_key_name = 'id') : string;
 
+    public function delete(string $table_name, string $column, string|int $value, string $operator = '=') : bool
+    {
+        $sql = $this->_delete_sql($table_name, $column, $value, $operator);
+        $this->query($sql)
+            ->execute();
+        return true;
+    }
+
+    abstract public function _delete_sql(string $table_name, string $column, string|int $value, string $operator = '=') : string;
 }

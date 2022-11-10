@@ -12,6 +12,8 @@ class Credential0implement extends Castle
     public string $_session_cookie_name;
     public int $_session_rotation_time;
     public string $_session_cookie_expiration_time;
+    public bool $_session_match_ip;
+    public int $_session_ip_mask;
     public bool $_remember_me_enabled;
     public string $_remember_me_cookie_name;
     public int $_remember_me_expiration;
@@ -27,18 +29,22 @@ class Credential0implement extends Castle
     public ?string $_received_session_token = NULL;
     public ?string $_session_token = NULL;
 
-    function __construct()
+    function __construct(bool $is_web_access= true)
     {
         $this->_user_table_name = static::_credential()['user_table_name'];
         $this->_session_table_name = static::_credential()['session_table_name'];
         $this->_session_cookie_name = static::_credential()['session_cookie_name'];
         $this->_session_rotation_time = (int) static::_credential()['session_rotation_time'];
         $this->_session_cookie_expiration_time = static::_credential()['session_cookie_expiration_time'];
+        $this->_session_match_ip = static::_credential()['session_match_ip'];
+        $this->_session_ip_mask = static::_credential()['session_ip_mask'];
         $this->_multiple_logins = static::_credential()['multiple_logins'];
         $this->_is_cookie_encrypted = static::_cookie_setting()['encrypt'];
         $this->_received_session_token = $this->get_cookie($this->_session_cookie_name);
         $this->_database0implement = database_implement(CSL_DB_INSTANCE_PRIMARY);
         $session = [];
+        if ($is_web_access === false)
+            return;
         if ($this->_received_session_token !== '')
             $session = $this->_find_session_by_token($this->_received_session_token);
         if ($this->_received_session_token === '' OR array_key_exists('id', $session) === false)
@@ -127,6 +133,13 @@ class Credential0implement extends Castle
     function delete_cookie(string $cookie_name) : bool
     {
         store_cookie($cookie_name, '', time() - static::COOKIE_DELETE_SEC);
+        return true;
+    }
+
+    function delete_session_data() : bool
+    {
+        database_implement(CSL_DB_INSTANCE_PRIMARY)
+            ->delete($this->_session_table_name, 'rotated_at', time() - $this->_session_cookie_expiration_time, '<');
         return true;
     }
 

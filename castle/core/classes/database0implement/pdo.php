@@ -200,4 +200,10 @@ EOF;
             ) .
             " WHERE `$primary_key_name` = " . $primary_key;
     }
+
+    public function _delete_sql(string $table_name, string $column, int|string $value, string $operator = '=') : string
+    {
+        $value_string = is_string($value) ? "'{$value}'" : $value;
+        return "DELETE FROM `{$table_name}` WHERE `{$column}` {$operator} " . $value_string;
+    }
 }

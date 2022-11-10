@@ -160,4 +160,11 @@ class Test_Class_Credential extends TestCase
         $result_3 = $credential0implement->_verify_password_hash($name, $pass_word  . 'hage');
         $this->assertFalse($result_3);
     }
+
+    function test_delete_session_data()
+    {
+        $credential0implement = new \castle\Credential0implement(false);
+        print_r($credential0implement);
+        $credential0implement->delete_session_data();
+    }
 }
