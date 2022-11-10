@@ -1,4 +1,5 @@
 <?php
+class Auth extends \castle\Auth {};
 class Response extends \castle\Response {};
 class Controller extends \castle\Controller {};
 class Cookie extends \castle\Cookie {};

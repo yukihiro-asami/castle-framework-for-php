@@ -65,6 +65,8 @@ class Credential0implement extends Castle
                     ];
                     $this->_update_session($this->_session_id, $params);
                     $this->set_cookie($this->_session_cookie_name, $this->_session_token, $this->_session_cookie_expiration_time);
+                } else {
+                    $this->_session_token = $this->_received_session_token;
                 }
             }
         }
@@ -101,9 +103,9 @@ class Credential0implement extends Castle
         return is_int($this->_user_id);
     }
 
-    function get_user_id() : ?int
+    function get_user_id() : int|bool
     {
-        return $this->_user_id;
+        return is_int($this->_user_id) ? $this->_user_id : false;
     }
 
     function set_cookie(string $cookie_name, array|string $value, int $expiration = 3600, string $path = '', string $domain = '') : bool

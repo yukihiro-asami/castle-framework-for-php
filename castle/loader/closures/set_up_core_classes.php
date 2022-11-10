@@ -5,6 +5,7 @@ return function (array &$vals) : string
     $base_path =& $vals['core_classes_dir'];
     $class_names = <<<EOF
 Castle
+Auth
 Cookie
 Controller
 Credential0implement
