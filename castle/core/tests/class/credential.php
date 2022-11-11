@@ -167,4 +167,14 @@ class Test_Class_Credential extends TestCase
         print_r($credential0implement);
         $credential0implement->delete_session_data();
     }
+
+    function test_store_rm_cookie()
+    {
+        $credential0implement = new \castle\Credential0implement(false);
+        $credential0implement->_store_remember_me('hogehoge', 11, '1.1.1.1', 'hoge hage ua', );
+        $result = $credential0implement->_find_remember_me_by_token('hogehoge');
+        print_r($result);
+        $result = $credential0implement->_find_remember_me_by_token('hogehoge1');
+        print_r($result);
+    }
 }

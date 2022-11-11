@@ -15,6 +15,7 @@ class Credential0implement extends Castle
     public bool $_session_match_ip;
     public int $_session_ip_mask;
     public bool $_remember_me_enabled;
+    public string $_remember_me_table_name;
     public string $_remember_me_cookie_name;
     public int $_remember_me_expiration;
     public bool $_remember_me_match_ip;
@@ -30,6 +31,7 @@ class Credential0implement extends Castle
     public ?string $_session_token = NULL;
     public ?string $_ip_address_must_be = NULL;
     public ?string $_user_agent_must_be = NULL;
+    public ?string $_received_remember_me_token = NULL;
 
     function __construct(bool $is_web_access= true)
     {
@@ -44,9 +46,15 @@ class Credential0implement extends Castle
         $this->_is_cookie_encrypted = static::_cookie_setting()['encrypt'];
         $this->_received_session_token = $this->get_cookie($this->_session_cookie_name);
         $this->_database0implement = database_implement(CSL_DB_INSTANCE_PRIMARY);
-        $session = [];
+        $this->_remember_me_enabled = static::_credential()['remember_me_enabled'];
+        $this->_remember_me_table_name = static::_credential()['remember_me_table_name'];
+        $this->_remember_me_cookie_name = static::_credential()['remember_me_cookie_name'];
+        $this->_remember_me_expiration = static::_credential()['remember_me_expiration'];
+        $this->_remember_me_match_ip = static::_credential()['remember_me_match_ip'];
+
         if ($is_web_access === false)
             return;
+        $session = [];
         if ($this->_received_session_token !== '')
             $session = $this->_find_session_by_token($this->_received_session_token);
         if ($this->_received_session_token === '' OR array_key_exists('id', $session) === false)
@@ -80,6 +88,7 @@ class Credential0implement extends Castle
                 }
             }
         }
+        $this->_received_remember_me_token = $this->get_cookie($this->_remember_me_cookie_name);
     }
 
     function login(string $user_name = '', string $password = '') : bool
@@ -133,9 +142,43 @@ class Credential0implement extends Castle
             AND $this->_is_ip_addresses_identical(static::_remote_addr(), $this->_ip_address_must_be, $this->_session_ip_mask);
     }
 
+    function check_remember_me() : bool
+    {
+        if ($this->_received_remember_me_token === '')
+            return false;
+        $remember_me_info = $this->_find_remember_me_by_token($this->_received_remember_me_token);
+        if ($remember_me_info === [])
+            return false;
+        $ip_address = static::_remote_addr();
+        $user_agent = static::_user_agent();
+        $this->_store_session(
+            [
+                'token' => $this->_session_token,
+                'is_logged_in' => 1,
+                'user_id' => $remember_me_info['user_id'],
+                'user_agent' => $user_agent,
+                'ip_address' => $ip_address
+            ]
+        );
+        $this->_user_id = $remember_me_info['user_id'];
+        return true;
+    }
+
     function get_user_id() : int|bool
     {
         return is_int($this->_user_id) ? $this->_user_id : false;
+    }
+
+    function remember_me() : bool
+    {
+        if ($this->_remember_me_enabled === false)
+            return false;
+        if ($this->_user_id === NULL)
+            return false;
+        $token = generate_token();
+        $this->set_cookie($this->_remember_me_cookie_name, $token, $this->_remember_me_expiration);
+        $this->_store_remember_me($token, $this->_user_id, static::_remote_addr(), static::_user_agent());
+        return true;
     }
 
     function set_cookie(string $cookie_name, array|string $value, int $expiration = 3600, string $path = '', string $domain = '') : bool
@@ -222,6 +265,28 @@ class Credential0implement extends Castle
                 $this->_session_table_name,
                 ['token'],
                 $params
+            );
+    }
+
+    function _find_remember_me_by_token(string $remember_me_token) : array
+    {
+        return database_implement(CSL_DB_INSTANCE_PRIMARY)
+            ->find_one_by($this->_remember_me_table_name, 'token', $remember_me_token);
+    }
+
+    function _store_remember_me(string $token, int $user_id, string $ip_address, string $user_agent) : void
+    {
+        $this->_database0implement
+            ->store(
+                $this->_remember_me_table_name,
+                ['token'],
+                [
+                    'token' => $token,
+                    'user_id' => $user_id,
+                    'ip_address' => $ip_address,
+                    'created_at_int' => time(),
+                    'user_agent' => $user_agent
+                ]
             );
     }
 
