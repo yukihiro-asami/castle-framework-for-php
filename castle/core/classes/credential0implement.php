@@ -21,7 +21,6 @@ class Credential0implement extends Castle
     public int $_remember_me_expiration;
     public bool $_remember_me_match_ip;
     public bool $_remember_me_match_ip_mask;
-    public bool $_multiple_logins;
     public bool $_is_cookie_encrypted;
     public ?int $_user_id = NULL;
     public ?string $_current_session_token = NULL;
@@ -44,7 +43,6 @@ class Credential0implement extends Castle
         $this->_session_cookie_expiration_time = static::_credential()['session_cookie_expiration_time'];
         $this->_session_match_ip = static::_credential()['session_match_ip'];
         $this->_session_ip_mask = static::_credential()['session_ip_mask'];
-        $this->_multiple_logins = static::_credential()['multiple_logins'];
         $this->_is_cookie_encrypted = static::_cookie_setting()['encrypt'];
         $this->_received_session_token = $this->get_cookie($this->_session_cookie_name);
         $this->_database0implement = database_implement(CSL_DB_INSTANCE_PRIMARY);
