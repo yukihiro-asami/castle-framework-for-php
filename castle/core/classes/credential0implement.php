@@ -7,6 +7,7 @@ class Credential0implement extends Castle
 {
     CONST COOKIE_DELETE_SEC = 3600;
     CONST MAX_PASSWORD_LENGTH = 128;
+    public bool $_logging = false;
     public string $_user_table_name;
     public string $_session_table_name;
     public string $_session_cookie_name;
@@ -35,6 +36,7 @@ class Credential0implement extends Castle
 
     function __construct(bool $is_web_access= true)
     {
+        $this->_logging = static::_credential()['logging'];
         $this->_user_table_name = static::_credential()['user_table_name'];
         $this->_session_table_name = static::_credential()['session_table_name'];
         $this->_session_cookie_name = static::_credential()['session_cookie_name'];
@@ -51,7 +53,6 @@ class Credential0implement extends Castle
         $this->_remember_me_cookie_name = static::_credential()['remember_me_cookie_name'];
         $this->_remember_me_expiration = static::_credential()['remember_me_expiration'];
         $this->_remember_me_match_ip = static::_credential()['remember_me_match_ip'];
-
         if ($is_web_access === false)
             return;
         $session = [];
@@ -95,7 +96,10 @@ class Credential0implement extends Castle
     {
         $user = $this->validate_user($user_name, $password);
         if ($user === false)
+        {
+            static::_log_info('fail to validate user');
             return false;
+        }
         $ip_address = static::_remote_addr();
         $user_agent = static::_user_agent();
         $this->_store_session(
@@ -137,18 +141,36 @@ class Credential0implement extends Castle
 
     function check() : bool
     {
+        if ($this->_check_session() === true)
+            return true;
+        $this->_log_credential('check session failed');
+        if ($this->_check_remember_me() === true)
+            return true;
+        $this->_log_credential('check remember me failed');
+        return false;
+    }
+
+    function _check_session() : bool
+    {
         return is_int($this->_user_id)
             AND static::_user_agent() === $this->_user_agent_must_be
             AND $this->_is_ip_addresses_identical(static::_remote_addr(), $this->_ip_address_must_be, $this->_session_ip_mask);
     }
 
-    function check_remember_me() : bool
+    function _check_remember_me() : bool
     {
         if ($this->_received_remember_me_token === '')
+        {
+            $this->_log_credential('check remember me failed: no remember me token');
             return false;
+        }
+
         $remember_me_info = $this->_find_remember_me_by_token($this->_received_remember_me_token);
         if ($remember_me_info === [])
+        {
+            $this->_log_credential('check remember me failed: no info stored for rm token');
             return false;
+        }
         $ip_address = static::_remote_addr();
         $user_agent = static::_user_agent();
         $this->_store_session(
@@ -314,5 +336,12 @@ class Credential0implement extends Castle
             static::_log_info($t);
             return false;
         }
+    }
+
+    function _log_credential(string $message) : void
+    {
+        if ($this->_logging === false)
+            return;
+        static::_log_info($message);
     }
 }

@@ -7,7 +7,7 @@ class Castle
         static::_log($message, '__INFO__');
     }
 
-    static protected function _log(\Throwable|string $message, string $lebel) : void
+    static protected function _log(\Throwable|string $message, string $label) : void
     {
         if ($message instanceof \Throwable)
         {
@@ -16,7 +16,7 @@ class Castle
         } else {
             $logging_message = $message . ' s_id:' . static::_value('syslog_id') . PHP_EOL;
         }
-        \castle\log(\castle\date_formatted() . ' '. $lebel . ' ' . $logging_message, static::_value('_log_file_path'));
+        \castle\log(\castle\date_formatted() . ' '. $label . ' ' . $logging_message, static::_value('_log_file_path'));
     }
 
     protected static function _request_uri() : string
