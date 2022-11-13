@@ -35,6 +35,8 @@ class Credential0implement extends Castle
 
     function __construct(bool $is_web_access= true)
     {
+        if ($is_web_access === false)
+            return;
         $this->_logging = static::_credential()['logging'];
         $this->_user_table_name = static::_credential()['user_table_name'];
         $this->_session_table_name = static::_credential()['session_table_name'];
@@ -51,8 +53,6 @@ class Credential0implement extends Castle
         $this->_remember_me_cookie_name = static::_credential()['remember_me_cookie_name'];
         $this->_remember_me_expiration = static::_credential()['remember_me_expiration'];
         $this->_remember_me_match_ip = static::_credential()['remember_me_match_ip'];
-        if ($is_web_access === false)
-            return;
         $session = [];
         if ($this->_received_session_token !== '')
             $session = $this->_find_session_by_token($this->_received_session_token);
@@ -146,6 +146,25 @@ class Credential0implement extends Castle
             return true;
         $this->_log_credential('check remember me failed');
         return false;
+    }
+
+    function _generate_anti_csrf_token(string $salt, int $user_id, int $session_id, int $expire) : string
+    {
+        $nonce = generate_token();
+        $expire_at = time() + $expire;
+        $token_string = $salt . $nonce . $user_id . $session_id . $expire_at;
+        return implode('|', [$nonce, md5($token_string), $expire_at]);
+    }
+
+    function _validate_anti_csrf_token(string $salt, int $user_id, int $session_id, string $anti_csrf_token) : array
+    {
+        list($nonce, $token, $expire_at) = explode('|', $anti_csrf_token);
+        if ($expire_at < time())
+            return [false, 'expired'];
+        $token_must_be = md5($salt . $nonce . $user_id . $session_id . $expire_at);
+        if ($token === $token_must_be)
+            return [true, ''];
+        return [false, 'invalid token'];
     }
 
     function _check_session() : bool

@@ -177,4 +177,29 @@ class Test_Class_Credential extends TestCase
         $result = $credential0implement->_find_remember_me_by_token('hogehoge1');
         print_r($result);
     }
+
+    function test_anti_()
+    {
+        $salt = 'hogehoge';
+        $user_id = 11;
+        $session_id = 144;
+        $expire = 3;
+        $credential0implement = new \castle\Credential0implement(false);
+        $token = $credential0implement->_generate_anti_csrf_token($salt, $user_id, $session_id, $expire);
+        list($is_ok, $message) = $credential0implement->_validate_anti_csrf_token($salt, $user_id, $session_id, $token);
+        $this->assertTrue($is_ok);
+        list($is_ok, $message) = $credential0implement->_validate_anti_csrf_token($salt, $user_id, $session_id, $token . 'hoge');
+        $this->assertFalse($is_ok);
+        echo $message . PHP_EOL;
+        list($is_ok, $message) = $credential0implement->_validate_anti_csrf_token($salt, 2, $session_id, $token);
+        $this->assertFalse($is_ok);
+        echo $message . PHP_EOL;
+        list($is_ok, $message) = $credential0implement->_validate_anti_csrf_token($salt, $user_id, 1, $token);
+        $this->assertFalse($is_ok);
+        echo $message . PHP_EOL;
+        sleep(10);
+        list($is_ok, $message) = $credential0implement->_validate_anti_csrf_token($salt, $user_id, $session_id, $token);
+        $this->assertFalse($is_ok);
+        echo $message . PHP_EOL;
+    }
 }
