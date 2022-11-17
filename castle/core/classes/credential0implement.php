@@ -32,6 +32,8 @@ class Credential0implement extends Castle
     public ?string $_ip_address_must_be = NULL;
     public ?string $_user_agent_must_be = NULL;
     public ?string $_received_remember_me_token = NULL;
+    public string $_anti_csrf_token_salt;
+    public int $_anti_csrf_token_expire;
 
     function __construct(bool $is_web_access= true)
     {
@@ -88,6 +90,8 @@ class Credential0implement extends Castle
             }
         }
         $this->_received_remember_me_token = $this->get_cookie($this->_remember_me_cookie_name);
+        $this->_anti_csrf_token_salt = static::_credential()['anti_csrf_token_salt'];
+        $this->_anti_csrf_token_expire = static::_credential()['anti_csrf_token_expire'];
     }
 
     function login(string $user_name = '', string $password = '') : bool
@@ -145,6 +149,20 @@ class Credential0implement extends Castle
         if ($this->_check_remember_me() === true)
             return true;
         $this->_log_credential('check remember me failed');
+        return false;
+    }
+
+    function anti_csrf_token() : string
+    {
+        return $this->_generate_anti_csrf_token($this->_anti_csrf_token_salt, $this->_user_id, $this->_session_id, $this->_anti_csrf_token_expire);
+    }
+
+    function validate_anti_csrf_token(string $token) : bool
+    {
+        list($is_token_ok, $message) = $this->_validate_anti_csrf_token($this->_anti_csrf_token_salt, $this->_user_id, $this->_session_id, $token);
+        if ($is_token_ok === true)
+            return true;
+        static::_log_info('validate anti csrf token failed:' . $message);
         return false;
     }
 

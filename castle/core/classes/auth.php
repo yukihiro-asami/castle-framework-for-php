@@ -22,6 +22,16 @@ class Auth extends Castle
         return static::_credential_implement()->get_user_id();
     }
 
+    static function anti_csrf_token() :string
+    {
+        return static::_credential_implement()->anti_csrf_token();
+    }
+
+    static function validate_anti_csrf_token(string $token) : bool
+    {
+        return static::_credential_implement()->validate_anti_csrf_token($token);
+    }
+
     static function _credential_implement() : Credential0implement
     {
         global $__credential;

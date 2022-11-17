@@ -11,4 +11,11 @@ class Input extends Castle
     {
         return static::_user_agent();
     }
+
+    static public function params(?string $name = NULL) : array|string
+    {
+        if ($name === null)
+            return static::_params();
+        return static::_params()[$name];
+    }
 }

@@ -44,6 +44,11 @@ class Castle
         return static::_value(__FUNCTION__);
     }
 
+    protected static function _params() : array
+    {
+        return static::_value(__FUNCTION__);
+    }
+
     protected static function _cookie_setting() : array
     {
         return static::_value(__FUNCTION__);
