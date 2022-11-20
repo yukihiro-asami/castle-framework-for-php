@@ -1,4 +1,4 @@
-#Castle Framework is a simple web application framework.
+Castle Framework is a simple web application framework.
 
 Perform on PHP +8.1, NGINX
 Fuelphp like API
