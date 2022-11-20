@@ -22,6 +22,8 @@ namespace
     const CSL_ENV_STAGING = 'staging';
     const CSL_ENV_PRODUCTION = 'production';
     const CSL_MEDIA_TYPE_APPLICATION_JSON = 'application/json';
+    const CSL_MODE_PHPUNIT = 'phpunit';
+    const CSL_MODE_TASK = 'task';
 }
 namespace castle
 {

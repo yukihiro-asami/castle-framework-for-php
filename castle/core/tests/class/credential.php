@@ -202,4 +202,10 @@ class Test_Class_Credential extends TestCase
         $this->assertFalse($is_ok);
         echo $message . PHP_EOL;
     }
+
+
+    function test_hoge()
+    {
+        echo 'hoge';
+    }
 }

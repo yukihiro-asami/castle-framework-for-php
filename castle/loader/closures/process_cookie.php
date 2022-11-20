@@ -3,7 +3,7 @@ namespace castle;
 
 return function (array &$vals) : string
 {
-    if (is_phpunit_mode() === true)
+    if (in_array(mode(), [CSL_MODE_PHPUNIT, CSL_MODE_TASK]))
     {
         $vals['captured_cookie_values'] = [];
     } else{
