@@ -24,6 +24,7 @@ namespace
     const CSL_MEDIA_TYPE_APPLICATION_JSON = 'application/json';
     const CSL_MODE_PHPUNIT = 'phpunit';
     const CSL_MODE_TASK = 'task';
+    const CSL_MODE_WEB = 'web';
 }
 namespace castle
 {

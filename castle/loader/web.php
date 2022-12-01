@@ -24,6 +24,7 @@ store_syslog
 EOF;
 
 /** @noinspection DuplicatedCode */
+$__mode = CSL_MODE_WEB;
 $__results = [];
 $__vals = [];
 $__body = '';
